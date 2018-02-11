@@ -1,0 +1,283 @@
+
+# coding: utf-8
+
+# In[3]:
+
+
+import pandas as pd
+
+
+# In[4]:
+
+
+death=pd.read_csv('/home/nbuser/library/CauseofDeath.csv')
+
+
+# 
+# 
+
+# In[5]:
+
+
+death['Deaths'][death['State']=='California']
+
+
+# In[6]:
+
+
+#want to remove all data that is suppressed or unreliable #could remove all non-numericals?
+# Remove rows with suppressed death counts
+death = death[~death['Deaths'].str.contains('Suppressed')]
+# Remove rows with unreliable crude rates
+death = death[~death['Crude Rate'].str.contains('Unreliable')]
+death.head(20)
+
+
+# In[7]:
+
+
+# You can see that some of these values are not represented as a numeric type, but as "object".  
+for column in death:
+    print(column,death[column].dtype)
+    
+for column in death:
+    print(column, death[column].dtype)
+
+
+# In[8]:
+
+
+# Let's at least fix the deaths column to be numeric, so that adding will work
+
+death['Deaths'] = death['Deaths'].astype('int64')
+death.head(20)
+
+
+# In[9]:
+
+
+death.rename(columns={'Prescriptions Dispensed by US Retailers in that year (millions)':'Prescriptions'})
+
+
+# In[ ]:
+
+
+
+
+
+# In[10]:
+
+
+death[ death['State'] == 'California' ]
+
+
+# In[11]:
+
+
+death[death['Year']==2014] #the quotes don't work on numbers like 2014 when searching by column!!! 
+
+
+# In[12]:
+
+
+year2014=death[death['Year']==2014].set_index('State').drop('Year',axis=1)
+year2013=death[death['Year']==2013].set_index('State').drop('Year',axis=1)
+year2012=death[death['Year']==2012].set_index('State').drop('Year',axis=1)
+year2011=death[death['Year']==2011].set_index('State').drop('Year',axis=1)
+year2010=death[death['Year']==2010].set_index('State').drop('Year',axis=1)
+year2009=death[death['Year']==2009].set_index('State').drop('Year',axis=1)
+year2008=death[death['Year']==2008].set_index('State').drop('Year',axis=1)
+year2007=death[death['Year']==2007].set_index('State').drop('Year',axis=1)
+year2006=death[death['Year']==2006].set_index('State').drop('Year',axis=1)
+year2005=death[death['Year']==2005].set_index('State').drop('Year',axis=1)
+year2004=death[death['Year']==2004].set_index('State').drop('Year',axis=1)
+year2003=death[death['Year']==2003].set_index('State').drop('Year',axis=1)
+year2002=death[death['Year']==2002].set_index('State').drop('Year',axis=1)
+year2001=death[death['Year']==2001].set_index('State').drop('Year',axis=1)
+year2000=death[death['Year']==2000].set_index('State').drop('Year',axis=1)
+year1999=death[death['Year']==1999].set_index('State').drop('Year',axis=1)
+#im sure there is an easier way to do this, but i'm using this for now 
+
+
+# In[13]:
+
+
+year2013.head(10) 
+
+
+# In[14]:
+
+
+year2014
+
+
+# In[15]:
+
+
+del death['Crude Rate']
+
+
+# In[16]:
+
+
+del death['Crude Rate Lower 95% Confidence Interval']
+
+
+# In[17]:
+
+
+del death['Crude Rate Upper 95% Confidence Interval']
+
+
+# In[18]:
+
+
+death.head(20)
+
+
+# In[19]:
+
+
+#okay so now I only have the data I really want within the data frame death and I can start my analysis
+
+
+# In[20]:
+
+
+sum_by_year = death.groupby('Year').sum() 
+
+
+# In[21]:
+
+
+sum_by_year.head(20)
+
+
+# In[22]:
+
+
+year2014['Deaths']-year1999['Deaths'] #the NaN results must be where there was a decrease in either drug death or population or prescriptions dispensed
+
+
+# In[23]:
+
+
+twoyears=year2014['Deaths']-year2012['Deaths'] #precriptions in US went down in these two years but many  states had many more deaths
+#which states are these specifically?
+twoyears.head(10)
+
+
+# In[35]:
+
+
+x=pd.DataFrame(twoyears)
+
+
+# In[24]:
+
+
+if twoyears[1]>100: 
+    print("more druggies") #tbh i'm not really sure what this function does
+
+
+# In[54]:
+
+
+x['Deaths']=int(x['Deaths'])
+
+
+# In[42]:
+
+
+(x.index[x['Deaths']>0])
+
+
+
+
+
+# In[48]:
+
+
+positive=x.index[x['Deaths']>0]
+
+
+# In[53]:
+
+
+x['Deaths'][positive]
+
+
+# In[45]:
+
+
+x=x.reindex(twoyears['State'].index) #this doesn't work because two years isn't a data frame?
+
+
+# In[ ]:
+
+
+
+
+
+# In[31]:
+
+
+twoyears
+
+
+# In[32]:
+
+
+# This is the main plotting library we will use
+import matplotlib.pyplot as plt
+# And this is the pandas library we have been using for handling data
+import pandas as pd
+
+
+# In[33]:
+
+
+my_widths = {'Deaths':10,'Population':3}
+print('The C values will be plotted with a line width of %d' % my_widths['C'])
+
+
+# In[58]:
+
+
+# This is the main plotting library we will use
+import matplotlib.pyplot as plt
+# And this is the pandas library we have been using for handling data
+import pandas as pd
+import numpy as np
+
+
+# In[59]:
+
+
+# Bar plot
+x.plot.bar(ylim=(0,max(x['Deaths'])),rot=45)
+
+
+# In[66]:
+
+
+y=pd.DataFrame(x['Deaths'][positive])
+
+
+# In[67]:
+
+
+y
+
+
+# In[69]:
+
+
+z=y.plot.bar(ylim=(0,max(y['Deaths'])),rot=45)
+
+
+# In[73]:
+
+
+z.axes.axis(self,{'auto'})
+
